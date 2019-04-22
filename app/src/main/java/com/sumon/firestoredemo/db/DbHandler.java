@@ -3,21 +3,20 @@ package com.sumon.firestoredemo.db;
 import java.util.ArrayList;
 
 public class DbHandler {
-    private ArrayList<MyData> myDataArrayList;
-
-    public DbHandler(ArrayList<MyData> myDataArrayList) {
-
-        this.myDataArrayList = myDataArrayList;
-    }
+    private ArrayList<MyData> response;
 
     public DbHandler() {
     }
 
-    public ArrayList<MyData> getMyDataArrayList() {
-        return myDataArrayList;
+    public DbHandler(ArrayList<MyData> response) {
+        this.response = response;
     }
 
-    public void setMyDataArrayList(ArrayList<MyData> myDataArrayList) {
-        this.myDataArrayList = myDataArrayList;
+    public ArrayList<MyData> getResponse() {
+        return response;
+    }
+
+    public void setResponse(ArrayList<MyData> response) {
+        this.response = response;
     }
 }

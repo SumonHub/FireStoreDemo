@@ -22,12 +22,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -61,30 +60,24 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        initCollapsingToolbar();
+        _initCollapsingToolbar();
+       // _addToFirestore();
+        _readFromFirestore();
+        _getRealTimeUpdate();
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-
-      //  _readFromFirestore();
-
-
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapter);
+        _initRecyclerView();
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+       /* FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               /* Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();*/
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
 
                 _addToFirestore();
             }
-        });
+        });*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -94,6 +87,29 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void _getRealTimeUpdate() {
+        ref.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Toast.makeText(MainActivity.this, "Error while loading!", Toast.LENGTH_LONG).show();
+                    Log.d(TAG, e.toString());
+                    return;
+                }
+
+                if (snapshot.exists()) {
+                    DbHandler note = snapshot.toObject(DbHandler.class);
+                    assert note != null;
+                    albumList.clear();
+                    albumList.addAll(note.getResponse());
+                    adapter.notifyDataSetChanged();
+                    //_initRecyclerView();
+                }
+            }
+        });
     }
 
     private void _addToFirestore() {
@@ -126,18 +142,29 @@ public class MainActivity extends AppCompatActivity
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 DbHandler note = documentSnapshot.toObject(DbHandler.class);
                 assert note != null;
-                albumList.addAll(note.getMyDataArrayList());
+                albumList.clear();
+                albumList.addAll(note.getResponse());
                 adapter.notifyDataSetChanged();
-                Log.d(TAG, "onSuccess: "+ note.getMyDataArrayList());
+                Log.d(TAG, "_readFromFirestore onSuccess: data size = "+ note.getResponse().size());
             }
         });
+    }
+
+    private void _initRecyclerView() {
+        adapter = new AlbumsAdapter(MainActivity.this, albumList);
+        recyclerView = findViewById(R.id.recycler_view);
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(MainActivity.this, 2);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(5), true));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
     }
 
     /**
      * Initializing collapsing toolbar
      * Will show and hide the toolbar title on scroll
      */
-    private void initCollapsingToolbar() {
+    private void _initCollapsingToolbar() {
         final CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(" ");
@@ -168,25 +195,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        ref.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
-                if (e != null) {
-                    Toast.makeText(MainActivity.this, "Error while loading!", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, e.toString());
-                    return;
-                }
-
-                if (documentSnapshot.exists()) {
-                    DbHandler note = documentSnapshot.toObject(DbHandler.class);
-                    assert note != null;
-                    albumList.addAll(note.getMyDataArrayList());
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        });
-
-        adapter = new AlbumsAdapter(this, albumList);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.sumon.firestoredemo.db;
 
 public class MyData {
+    // firestore data source
+    // define node name
     String a, b;
 
     public MyData() {

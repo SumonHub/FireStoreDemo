@@ -5,9 +5,15 @@
     <color name="colorAccent">#D81B60</color>
     <color name="album_title">#ffffff</color>
     <color name="viewBg">#f1f5f8</color>
-    <!-- Google Logo Color -->
-    <color name="google_blue">#4285F4</color>
-    <color name="google_green">#34A853</color>
-    <color name="google_yellow">#FBBC05</color>
-    <color name="google_red">#EA4335</color>
+    <!-- Google Logo Color
+    google_cyan
+
+
+
+    Lime
+    -->
+    <color name="google_cyan">#006978</color>
+    <color name="google_teal">#009688</color>
+    <color name="google_green">#4caf50</color>
+    <color name="google_blue_grey">#607d8b</color>
 </resources>

@@ -2,6 +2,9 @@ package com.sumon.firestoredemo.rv;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,6 +22,7 @@ import com.sumon.firestoredemo.R;
 import com.sumon.firestoredemo.db.MyData;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Ravi Tamada on 18/05/16.
@@ -27,6 +31,12 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.MyViewHold
 
     private Context mContext;
     private List<MyData> albumList;
+    private final int[] backgroundColors = {
+            R.color.google_teal,
+            R.color.google_green,
+            R.color.google_blue_grey,
+            R.color.google_cyan};
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView title;
@@ -46,8 +56,9 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.MyViewHold
         this.albumList = albumList;
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card, parent, false);
 
@@ -55,34 +66,15 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.MyViewHold
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         MyData myData = albumList.get(position);
-        holder.title.setText(myData.getA());
-       // holder.count.setText(myData.getB() + " songs");
+        holder.title.setText(myData.getA() + "// position " + position);
 
-        // loading myData cover using Glide library
-     //   Glide.with(mContext).load(myData.getThumbnail()).into(holder.thumbnail);
+        Random rnd = new Random();
+        int currentColor = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
 
-       /* holder.overflow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showPopupMenu(holder.overflow);
-            }
-        });*/
-
-        if (position == 0) {
-            holder.relativeLayout.setBackgroundTintList(ColorStateList.valueOf(mContext.getResources().getColor(R.color.google_blue)));
-        } else if (position % 2 == 0) {
-            holder.relativeLayout.setBackgroundTintList(ColorStateList.valueOf(mContext.getResources().getColor(R.color.google_green)));
-        } else if (position % 3 == 0) {
-            holder.relativeLayout.setBackgroundTintList(ColorStateList.valueOf(mContext.getResources().getColor(R.color.google_yellow)));
-        } else if (position % 4 == 0) {
-            holder.relativeLayout.setBackgroundTintList(ColorStateList.valueOf(mContext.getResources().getColor(R.color.google_red)));
-        } else {
-            holder.relativeLayout.setBackgroundTintList(ColorStateList.valueOf(mContext.getResources().getColor(R.color.colorPrimary)));
-        }
-
-
+        int bgColor = ContextCompat.getColor(mContext, backgroundColors[position % 4]);
+        holder.relativeLayout.setBackgroundColor(bgColor);
 
     }
 
